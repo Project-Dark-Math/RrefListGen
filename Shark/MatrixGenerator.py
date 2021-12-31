@@ -29,9 +29,11 @@ def generateMatrixWithRank(n, m, rank, pool):
     mat = matmul(mat, B)
     return mat
 
+def gen():
+    n, m = randint(3, 6), randint(3, 6)
+    r, pool = randint(2, min(n, m)), choice(pools[:1])
 
-n, m = randint(3, 6), randint(3, 6)
-r, pool = randint(2, min(n, m)), choice(pools)
+    print(n, m)
+    printMatrix(generateMatrixWithRank(n, m, r, pool))
 
-print(n, m)
-printMatrix(generateMatrixWithRank(n, m, r, pool))
+gen()
