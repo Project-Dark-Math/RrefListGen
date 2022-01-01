@@ -119,14 +119,14 @@ def GaussJordanDecomposition(matrix):
     opList, matrix = GaussDecomposition(matrix)
     n, m = len(matrix), len(matrix[0])
 
-    for row in matrix:
+    for k, row in enumerate(matrix):
         if all(x == 0 for x in row):
             return opList, matrix
         else:
             j = row.index(1)
             col = [matrix[i][j] for i in range(n)]
             newOps = [
-                RowAddition(j, i, -x) for i, x in enumerate(col) if i < j and x != 0
+                RowAddition(k, i, -x) for i, x in enumerate(col) if i < k and x != 0
             ]
             for op in newOps:
                 op.applyTo(matrix)

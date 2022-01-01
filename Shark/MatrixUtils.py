@@ -11,6 +11,10 @@ def printOps(opList):
         print(op)
 
 
+def identityMatrix(n):
+    return [[int(i == j) for j in range(n)] for i in range(n)]
+
+
 def transpose(A):
     return list(map(list, zip(*A)))
 

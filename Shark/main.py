@@ -14,4 +14,5 @@ def main():
     printMatrix(RREF)
 
 
-main()
+if __name__ == "__main__":
+    main()
