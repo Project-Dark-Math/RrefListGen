@@ -109,18 +109,22 @@ data Oracle a =
         , isHalt :: Bool
         }
 
+-- Debug Mode
+-- instance (Show a) => Show (Oracle a) where
+--     show (Oracle elems mat matEntity pivotLoc loc halt) =
+--         "Oracle {\n    getElemOps = " ++
+--         show elems ++
+--         "\n    getMatrix = \n" ++
+--         show mat ++
+--         "    getMaxEntry = " ++
+--         show matEntity ++
+--         "\n    getPivotLoc = " ++
+--         show pivotLoc ++
+--         "\n    getLocation = " ++
+--         show loc ++ "\n    isHalt = " ++ show halt ++ "\n}"
 instance (Show a) => Show (Oracle a) where
-    show (Oracle elems mat matEntity pivotLoc loc halt) =
-        "Oracle {\n    getElemOps = " ++
-        show elems ++
-        "\n    getMatrix = \n" ++
-        show mat ++
-        "    getMaxEntry = " ++
-        show matEntity ++
-        "\n    getPivotLoc = " ++
-        show pivotLoc ++
-        "\n    getLocation = " ++
-        show loc ++ "\n    isHalt = " ++ show halt ++ "\n}"
+    show (Oracle elems mat _ _ _ _) =
+        replace "%" "/" $ (unlines . map show . reverse $ elems) ++ show mat
 
 matrixToOracle :: Matrix a -> Oracle a
 matrixToOracle mat = Oracle [] mat (maxRow, maxCol) (1, 1) (1, 1) False
@@ -217,5 +221,28 @@ foo :: (Field a) => Oracle a -> Oracle a
 foo = makePivotOneCol . changeIfNecessary . findColPivot
 
 -- TODO: implement IO
+-- copy-paste from Data.List.Extra source code
+replace :: (Eq a) => [a] -> [a] -> [a] -> [a]
+replace [] _ _ = error "first argument cannot be empty"
+replace from to xs
+    | Just xs <- L.stripPrefix from xs = to ++ replace from to xs
+replace from to (x:xs) = x : replace from to xs
+replace from to [] = []
+
+mapIf :: (a -> Bool) -> (a -> a) -> (a -> a) -> [a] -> [a]
+mapIf _ _ _ [] = []
+mapIf condition f g (x:xs)
+    | condition x = f x : mapIf condition f g xs
+    | otherwise = g x : mapIf condition f g xs
+
+readMatrix :: String -> Matrix Rational
+readMatrix string =
+    makeMatrix (read n) (read m) .
+    map read . mapIf (L.elem '/') (replace "/" "%") (++ "%1") $
+    rest
+  where
+    (n:m:rest) = words string
+
 main :: IO ()
-main = undefined
+main =
+    readFile "./input.txt" >>= print . runOracle . matrixToOracle . readMatrix
